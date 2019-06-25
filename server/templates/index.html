@@ -44,12 +44,15 @@
                 <input type="text" class="form-control" id="kalimat-text">
             </div>
 
-            <button type="submit" id="submit-kalimat-btn" class="btn btn-default">Analisa</button>
+            <div class="row text-center">
+
+                <button type="submit" id="submit-kalimat-btn" class="btn btn-success">Analisa</button>
+
+            </div>
         </form>
+        <br>
+        <div id="result"></div>
 
-        <p id="status">Hehe</p>
-
-        <table class="table table-striped" id="table-result"></table>
     </div>
 
     <script>
@@ -67,10 +70,10 @@
                 contentType: 'application/json; charset=UTF-8',
                 data: JSON.stringify(dataObj),
                 success: (resp) => {
-                    $("#status").text("Kelar")
                     let respObj = resp
 
-                    let tableContent = "<thead>"
+                    let tableContent = "<table class='table table-striped' id='table-result'>"
+                    tableContent += "<thead>"
                     tableContent += "</tr>"
                     tableContent += "<th style='text-align:center'>Aspek</th>"
                     tableContent += "<th style='text-align:center'>Polaritas Sentimen</th>"
@@ -83,23 +86,24 @@
                         tableContent += "<td style='text-align:center'>" + entry[0] + "</td>"
                         // tableContent += "<td style='text-align:center'>" + entry[1] + "</td>"
                         if (entry[1] === "positive") {
-                            tableContent += "<td style='text-align:center; color:blue'>" + entry[1] + "</td>"
+                            tableContent += "<td class='col-md-6' style='text-align:center; color:blue'>" + entry[1] + "</td>"
                         }
                         else if (entry[1] === "negative") {
-                            tableContent += "<td style='text-align:center; color:red'>" + entry[1] + "</td>"
+                            tableContent += "<td class='col-md-6' style='text-align:center; color:red'>" + entry[1] + "</td>"
                         }
                         else {
-                            tableContent += "<td style='text-align:center; color:green'>" + entry[1] + "</td>"
+                            tableContent += "<td class='col-md-6' style='text-align:center; color:green'>" + entry[1] + "</td>"
                         }
 
                         tableContent += "</tr>"
                     })
 
                     tableContent += "</tbody>"
+                    tableContent += "</table>"
 
                     console.log(tableContent)
 
-                    $('#table-result').html(tableContent)
+                    $('#result').html(tableContent)
                 },
                 error: (xhr, ajaxOptions, thrownError) => {
                     $("#status").text("error")
@@ -107,7 +111,7 @@
                 }
             });
 
-            $("#status").text("Lagi loading")
+            $("#result").html("<strong><p style='text-align: center'>Menganalisa...</p></strong>")
 
         })
     </script>
