@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from process_controller import ProcessController
 from pprint import pprint
-import json
 
 app = Flask(__name__)
 controller = object()
@@ -14,11 +13,11 @@ def index():
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
-    sentence = request.get_json(silent=True)["sentence"]
-    pprint(sentence)
-    # sentence = request.get_json(force=True)["sentence"]
+    pprint(request.get_json(force=True))
+    # sentence = request.get_json(silent=True, force=True)["sentence"]
+    sentence = request.get_json(force=True)["sentence"]
 
-    return json.dumps(controller.start_process(sentence))
+    return jsonify(controller.start_process(sentence))
     # return request.form.get("sentence")
 
 

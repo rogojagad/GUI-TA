@@ -38,16 +38,79 @@
             </ul>
         </div>
 
-        <form action="/action_page.php">
+        <form action="" id="form-kalimat">
             <div class="form-group">
-                <label for="email">Masukkan kalimat ulasan:</label>
-                <input type="email" class="form-control" id="email">
+                <label for="text">Masukkan kalimat ulasan:</label>
+                <input type="text" class="form-control" id="kalimat-text">
             </div>
 
-            <button type="analyze" class="btn btn-default">Analisa</button>
+            <button type="submit" id="submit-kalimat-btn" class="btn btn-default">Analisa</button>
         </form>
+
+        <p id="status">Hehe</p>
+
+        <table class="table table-striped" id="table-result"></table>
     </div>
 
+    <script>
+        $("#form-kalimat").submit((event) => {
+            event.preventDefault()
+
+            let sentenceData = $("#kalimat-text").val()
+            let dataObj = Object()
+            dataObj.sentence = sentenceData
+            // console.log(JSON.stringify(dataObj))
+
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:5000/analyze",
+                contentType: 'application/json; charset=UTF-8',
+                data: JSON.stringify(dataObj),
+                success: (resp) => {
+                    $("#status").text("Kelar")
+                    let respObj = resp
+
+                    let tableContent = "<thead>"
+                    tableContent += "</tr>"
+                    tableContent += "<th style='text-align:center'>Aspek</th>"
+                    tableContent += "<th style='text-align:center'>Polaritas Sentimen</th>"
+                    tableContent += "</tr>"
+                    tableContent += "</thead>"
+                    tableContent += "<tbody>"
+
+                    Object.entries(respObj.result).forEach(entry => {
+                        tableContent += "<tr>"
+                        tableContent += "<td style='text-align:center'>" + entry[0] + "</td>"
+                        // tableContent += "<td style='text-align:center'>" + entry[1] + "</td>"
+                        if (entry[1] === "positive") {
+                            tableContent += "<td style='text-align:center; color:blue'>" + entry[1] + "</td>"
+                        }
+                        else if (entry[1] === "negative") {
+                            tableContent += "<td style='text-align:center; color:red'>" + entry[1] + "</td>"
+                        }
+                        else {
+                            tableContent += "<td style='text-align:center; color:green'>" + entry[1] + "</td>"
+                        }
+
+                        tableContent += "</tr>"
+                    })
+
+                    tableContent += "</tbody>"
+
+                    console.log(tableContent)
+
+                    $('#table-result').html(tableContent)
+                },
+                error: (xhr, ajaxOptions, thrownError) => {
+                    $("#status").text("error")
+                    console.log(xhr.responseText)
+                }
+            });
+
+            $("#status").text("Lagi loading")
+
+        })
+    </script>
 </body>
 
 </html>
