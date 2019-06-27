@@ -44,9 +44,11 @@ class SentimentAnalyzer(BaseAnalyzer):
 
         for idx, data in enumerate(sentence_data):
             if data[2] == "B":
-
+                print(data[0])
                 backward_value = self.analyze_backward(sentence_data, idx)
+                print("Backward val : {}".format(backward_value))
                 forward_value = self.analyze_forward(sentence_data, idx)
+                print("Forward val : {}".format(forward_value))
                 total_polarity_value = backward_value + forward_value
 
                 if total_polarity_value > 0:
@@ -59,7 +61,7 @@ class SentimentAnalyzer(BaseAnalyzer):
                 result[self.current_target_words_list[target_counter]] = polarity
 
                 target_counter += 1
-
+                print()
         return result
 
     def analyze_backward(self, doc, target_idx):
@@ -68,20 +70,24 @@ class SentimentAnalyzer(BaseAnalyzer):
         total_value = 0
 
         while i >= 0:
-            opinion_word = doc[i][0]
+            if doc[i][2] != "I" and doc[i][2] != "B":
+                opinion_word = doc[i][0]
 
-            lexicon_value = self.get_lexicon_value_sum(opinion_word.lower(), doc[i])
+                lexicon_value = self.get_lexicon_value_sum(opinion_word.lower(), doc[i])
 
-            distance_value = self.get_distance_value_sum(
-                target_word, target_idx, opinion_word, i
-            )
+                distance_value = self.get_distance_value_sum(
+                    target_word, target_idx, opinion_word, i
+                )
 
-            value = lexicon_value / distance_value
+                value = lexicon_value / distance_value
 
-            if self.check_negation(i, doc):
-                value *= -1
+                if self.check_negation(i, doc):
+                    value *= -1
 
-            total_value += value
+                total_value += value
+
+                print(doc[i][0])
+                print(value)
 
             i -= 1
 
@@ -92,7 +98,8 @@ class SentimentAnalyzer(BaseAnalyzer):
         target_word = doc[target_idx][0]
 
         for i in range(target_idx + 1, len(doc)):
-            if doc[i][2] != "I":
+            if doc[i][2] != "I" and doc[i][2] != "B":
+                print(doc[i])
                 opinion_word = doc[i][0]
 
                 lexicon_value = self.get_lexicon_value_sum(opinion_word.lower(), doc[i])
@@ -107,6 +114,11 @@ class SentimentAnalyzer(BaseAnalyzer):
                     value *= -1
 
                 total_value += value
+
+                print(doc[i][0])
+                print(value)
+            else:
+                continue
         return total_value
 
     def get_lexicon_value_sum(self, opinion_word, token_data):
@@ -124,6 +136,8 @@ class SentimentAnalyzer(BaseAnalyzer):
         dependency_distance = self.dependency_path_distance_getter.get_distance_value(
             target_word.lower(), target_idx, opinion_word.lower(), i
         )
+
+        print(dependency_distance)
 
         return dependency_distance
 
